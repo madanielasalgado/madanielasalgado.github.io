@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniela Salgado</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: rgba(0,0,0,0.82);
+    --ink-2: rgba(0,0,0,0.62);
+    --ink-3: rgba(0,0,0,0.40);
+    --rule: rgba(0,0,0,0.15);
+    --left-w: 220px;
+    --bio-w: 420px;
+    --pad: 1.5rem;
+  }
+
+  html, body {
+    height: 100%;
+    font-size: 16px;
+  }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #fff;
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ─── LEFT COLUMN: name + nav + email ─── */
+  .col-left {
+    width: var(--left-w);
+    flex-shrink: 0;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .site-name {
+    font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 1.85rem;
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    user-select: none;
+  }
+  .site-name:hover { opacity: 0.7; }
+
+  nav { display: flex; flex-direction: column; gap: 0.15rem; }
+  nav a {
+    font-family: Georgia, serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-decoration: none;
+    line-height: 1.7;
+    cursor: pointer;
+  }
+  nav a:hover { opacity: 0.5; }
+  nav a.active { text-decoration: underline; text-underline-offset: 3px; }
+
+  .col-email {
+    margin-top: auto;
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.3rem;
+    line-height: 1.4;
+  }
+  .col-email::before { content: "↳"; flex-shrink: 0; }
+  .col-email:hover { color: var(--ink); }
+
+  /* ─── BIO COLUMN: always visible ─── */
+  .col-bio {
+    width: var(--bio-w);
+    flex-shrink: 0;
+    padding: var(--pad) 2rem var(--pad) var(--pad);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .bio-label {
+    font-family: Georgia, serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 1.3rem;
+  }
+
+  .bio-para {
+    font-family: Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ─── RIGHT COLUMN: changes per section ─── */
+  .col-right {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+  }
+
+  /* default empty state */
+  .col-right-empty {
+    height: 100%;
+  }
+
+  /* ─── SECTIONS ─── */
+  .panel { display: none; padding: var(--pad); }
+  .panel.visible { display: block; }
+
+  /* ─── PROJECTS GRID ─── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem 1.5rem;
+  }
+
+  .project-card { cursor: pointer; }
+
+  .project-thumb {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    margin-bottom: 0.55rem;
+    background: #ede9e3;
+  }
+  .project-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: opacity 0.2s;
+  }
+  .project-card:hover .project-thumb img { opacity: 0.82; }
+
+  .thumb-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-3);
+    font-family: Georgia, serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  .project-card-title {
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+  .project-card-location {
+    font-family: Georgia, serif;
+    font-size: 0.76rem;
+    color: var(--ink-3);
+    margin-top: 0.12rem;
+  }
+
+  /* ─── PROJECT DETAIL ─── */
+  #panel-detail { padding: 0; }
+
+  .detail-wrap {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .detail-meta {
+    width: 280px;
+    flex-shrink: 0;
+    padding: var(--pad);
+    border-right: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .detail-back {
+    display: inline-block;
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    color: var(--ink-3);
+    cursor: pointer;
+    margin-bottom: 1.4rem;
+    text-decoration: none;
+  }
+  .detail-back:hover { color: var(--ink); }
+
+  .detail-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 0.7rem;
+  }
+
+  .detail-collab {
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+    line-height: 1.55;
+    margin-bottom: 1.1rem;
+  }
+
+  .detail-overview-label {
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    margin-bottom: 0.35rem;
+  }
+
+  .detail-overview {
+    font-family: Georgia, serif;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .detail-images {
+    flex: 1;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+
+  .detail-img-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+  .detail-img-wrap img { width: 100%; max-width: 560px; display: block; }
+
+  .img-placeholder {
+    width: 100%; max-width: 560px;
+    aspect-ratio: 4/3;
+    background: #ede9e3;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-3);
+    font-family: Georgia, serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  .detail-caption {
+    font-family: Arial, sans-serif;
+    font-size: 0.7rem;
+    color: var(--ink-3);
+    line-height: 1.35;
+    max-width: 560px;
+  }
+
+  /* ─── WRITINGS ─── */
+  .writings-list { display: flex; flex-direction: column; }
+
+  .writing-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .writing-row:first-child { border-top: 1px solid var(--rule); }
+  .writing-row:hover .writing-row-title { opacity: 0.5; }
+
+  .writing-row-title {
+    font-family: Georgia, serif;
+    font-size: 0.93rem;
+    color: var(--ink);
+    flex: 1;
+    line-height: 1.4;
+  }
+  .writing-row-year {
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  /* ─── DRAWINGS ─── */
+  .drawings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .drawing-thumb img { width: 100%; display: block; }
+  .drawing-thumb-placeholder {
+    width: 100%; aspect-ratio: 3/4;
+    background: #ede9e3;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-3);
+    font-family: Georgia, serif;
+    font-size: 0.75rem;
+  }
+
+  /* ─── CV ─── */
+  .cv-tagline {
+    font-family: Georgia, serif;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    font-style: italic;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .cv-labyrinth {
+    width: 150px;
+    display: block;
+    margin: 0 auto 3rem auto;
+    opacity: 0.8;
+  }
+
+  .cv-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.4rem;
+  }
+
+  .cv-col-label {
+    font-family: Arial, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 1.1rem;
+  }
+
+  .cv-entry { margin-bottom: 1.3rem; }
+
+  .cv-entry-title {
+    font-family: Georgia, serif;
+    font-size: 0.83rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .cv-entry-title em { font-style: italic; }
+
+  .cv-entry-sub {
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin-top: 0.1rem;
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 720px) {
+    body { flex-direction: column; }
+
+    .col-left {
+      position: static; height: auto;
+      width: 100%;
+      flex-direction: row; flex-wrap: wrap;
+      align-items: center; gap: 0.6rem 1.2rem;
+      border-bottom: 1px solid var(--rule);
+      padding: 1rem var(--pad);
+    }
+    nav { flex-direction: row; gap: 0.8rem; }
+    .col-email { margin-top: 0; }
+
+    .col-bio {
+      position: static; height: auto;
+      width: 100%;
+      border-left: none; border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: var(--pad);
+    }
+
+    .col-right { height: auto; overflow-y: visible; }
+
+    .detail-wrap { flex-direction: column; }
+    .detail-meta { position: static; height: auto; width: 100%; border-right: none; border-bottom: 1px solid var(--rule); }
+
+    .cv-cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT: name + nav + email -->
+<aside class="col-left">
+  <span class="site-name" onclick="showPanel(null)">Daniela<br>Salgado</span>
+  <nav>
+    <a id="nav-projects" onclick="showPanel('projects')">Projects</a>
+    <a id="nav-writings" onclick="showPanel('writings')">Writings</a>
+    <a id="nav-drawings" onclick="showPanel('drawings')">Drawings</a>
+    <a id="nav-cv"       onclick="showPanel('cv')">CV</a>
+  </nav>
+  <a class="col-email" href="mailto:madanielaslgado@gmail.com">madanielaslgado@gmail.com</a>
+</aside>
+
+<!-- CENTER: bio — always visible -->
+<div class="col-bio">
+  <p class="bio-label">Bio;</p>
+  <p class="bio-para">Architect and eco-social designer with a background in furniture, interiors, and spatial research. I've always been drawn to the questions underneath the project — who a space is built for, what it carries, and what it leaves out.</p>
+  <p class="bio-para">I'm drawn to projects where design, territory, and community overlap.<br>Based between Ecuador and Italy.</p>
+</div>
+
+<!-- RIGHT: changes per section -->
+<div class="col-right">
+
+  <!-- empty default -->
+  <div id="panel-empty" class="panel visible col-right-empty"></div>
+
+  <!-- PROJECTS -->
+  <div id="panel-projects" class="panel">
+    <div class="projects-grid">
+
+      <div class="project-card" onclick="showDetail('forest')">
+        <div class="project-thumb">
+          <!-- Para agregar imagen: reemplaza la línea de abajo con: <img src="tu-imagen.jpg" alt="..."> -->
+          <div class="thumb-placeholder">[ imagen ]</div>
+        </div>
+        <div class="project-card-title">Architecture inside a protected forest</div>
+        <div class="project-card-location">Guayaquil, Ecuador</div>
+      </div>
+
+      <div class="project-card" onclick="showDetail('shade')">
+        <div class="project-thumb">
+          <div class="thumb-placeholder">[ imagen ]</div>
+        </div>
+        <div class="project-card-title">Shared shade — Urban furniture</div>
+        <div class="project-card-location">Guayaquil, Ecuador</div>
+      </div>
+
+      <!-- ↓ COPIA ESTE BLOQUE para agregar más proyectos ↓ -->
+      <!--
+      <div class="project-card" onclick="showDetail('NOMBRE_CORTO')">
+        <div class="project-thumb">
+          <div class="thumb-placeholder">[ imagen ]</div>
+        </div>
+        <div class="project-card-title">Título del proyecto</div>
+        <div class="project-card-location">Ciudad, País</div>
+      </div>
+      -->
+
+    </div>
+  </div>
+
+  <!-- PROJECT DETAIL -->
+  <div id="panel-detail" class="panel">
+    <div class="detail-wrap">
+      <div class="detail-meta">
+        <span class="detail-back" onclick="showPanel('projects')">( Back )</span>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <p class="detail-collab" id="detail-collab"></p>
+        <p class="detail-overview-label">Overview:</p>
+        <p class="detail-overview" id="detail-overview"></p>
+      </div>
+      <div class="detail-images" id="detail-images"></div>
+    </div>
+  </div>
+
+  <!-- WRITINGS -->
+  <div id="panel-writings" class="panel">
+    <div class="writings-list">
+      <!-- Agrega tus textos aquí con este formato: -->
+      <a class="writing-row" href="#">
+        <span class="writing-row-title">Título del texto o ensayo</span>
+        <span class="writing-row-year">2024</span>
+      </a>
+      <!-- Copia el bloque de arriba para cada texto nuevo -->
+    </div>
+  </div>
+
+  <!-- DRAWINGS -->
+  <div id="panel-drawings" class="panel">
+    <div class="drawings-grid">
+      <!-- Agrega tus dibujos aquí. Cuando tengas imágenes, reemplaza el div placeholder por: <img src="dibujo.jpg" alt="..."> -->
+      <div class="drawing-thumb"><div class="drawing-thumb-placeholder">[ dibujo ]</div></div>
+      <div class="drawing-thumb"><div class="drawing-thumb-placeholder">[ dibujo ]</div></div>
+      <div class="drawing-thumb"><div class="drawing-thumb-placeholder">[ dibujo ]</div></div>
+    </div>
+  </div>
+
+  <!-- CV -->
+  <div id="panel-cv" class="panel">
+    <p class="cv-tagline">Daniela Salgado — making, designing, thinking — in no particular order</p>
+
+    <svg class="cv-labyrinth" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g fill="none" stroke="rgba(0,0,0,0.82)" stroke-linecap="round" stroke-linejoin="round">
+        <!-- outer rings -->
+        <path d="M100,12 A88,88 0 1,1 99.9,12" stroke-width="2.5"/>
+        <path d="M100,24 A76,76 0 1,1 99.9,24" stroke-width="2"/>
+        <path d="M100,36 A64,64 0 1,1 99.9,36" stroke-width="2"/>
+        <path d="M100,48 A52,52 0 1,1 99.9,48" stroke-width="2"/>
+        <path d="M100,60 A40,40 0 1,1 99.9,60" stroke-width="1.5"/>
+        <path d="M100,72 A28,28 0 1,1 99.9,72" stroke-width="1.5"/>
+        <path d="M100,84 A16,16 0 1,1 99.9,84" stroke-width="1.5"/>
+        <!-- gaps / passages (white lines over rings) -->
+        <line x1="100" y1="12"  x2="100" y2="36"  stroke="#fff" stroke-width="5"/>
+        <line x1="188" y1="100" x2="164" y2="100" stroke="#fff" stroke-width="5"/>
+        <line x1="12"  y1="100" x2="36"  y2="100" stroke="#fff" stroke-width="5"/>
+        <line x1="100" y1="188" x2="100" y2="164" stroke="#fff" stroke-width="5"/>
+        <line x1="152" y1="100" x2="176" y2="100" stroke="#fff" stroke-width="5"/>
+        <line x1="48"  y1="100" x2="24"  y2="100" stroke="#fff" stroke-width="5"/>
+        <!-- figure -->
+        <circle cx="100" cy="92" r="5" stroke-width="2"/>
+        <line x1="100" y1="97"  x2="100" y2="112" stroke-width="2"/>
+        <line x1="93"  y1="103" x2="107" y2="103" stroke-width="2"/>
+        <line x1="100" y1="112" x2="93"  y2="122" stroke-width="2"/>
+        <line x1="100" y1="112" x2="107" y2="122" stroke-width="2"/>
+      </g>
+    </svg>
+
+    <div class="cv-cols">
+
+      <div>
+        <p class="cv-col-label">Education</p>
+        <div class="cv-entry">
+          <p class="cv-entry-title">Master in Eco-Social Design — MAECI Scholarship (EN, IT)<br><em>Thesis: Plug-ins for pluriversal &amp; relational pedagogies</em></p>
+          <p class="cv-entry-sub">Free University of Bozen-Bolzano, Italy<br>2022 – 2025</p>
+        </div>
+        <div class="cv-entry">
+          <p class="cv-entry-title">Architecture &amp; Furniture Design (ES)<br><em>Thesis: Architecture inside a protected forest</em></p>
+          <p class="cv-entry-sub">University of Guayaquil, Ecuador<br>2017 – 2021</p>
+        </div>
+        <div class="cv-entry">
+          <p class="cv-entry-title">Photography (ES)<br><em>Final project: Barrios de Guayaquil</em></p>
+          <p class="cv-entry-sub">UTPL, Guayaquil, Ecuador<br>2020</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="cv-col-label">Workshops &amp; Talks</p>
+        <div class="cv-entry">
+          <p class="cv-entry-title"><em>De los Andes a los Alpes (ES)</em></p>
+          <p class="cv-entry-sub">Conference about designing in the Alps vs in the Andes.<br>ESPOL, Guayaquil, Ecuador<br>2026</p>
+        </div>
+        <div class="cv-entry">
+          <p class="cv-entry-title"><em>Testing the plug-ins (EN, IT)</em></p>
+          <p class="cv-entry-sub">Participatory design workshop with students.<br>Realgymnasium und Fachoberschule für Bauwesen „Peter Anich", Bolzano, Italy<br>2025</p>
+        </div>
+        <div class="cv-entry">
+          <p class="cv-entry-title"><em>Networks of Care (EN, IT)</em></p>
+          <p class="cv-entry-sub">Participatory hands-on mycelium workshop with professors from UNIBZ.</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="cv-col-label">Publications &amp; Certificates</p>
+        <div class="cv-entry">
+          <p class="cv-entry-title"><em>The Avocado (Persea americana Mill.): A Review and Sustainability Perspectives. (EN)</em></p>
+          <p class="cv-entry-sub">Bhore, S. J.; Salgado-Ochoa, M.D.; Houssari, A. A.; Zelaya, A.L.; Yang, R.; Chen, Z.; Deeya, S. S.; Sens, S. C. D. S.; Schumann, M.; Zhang, Z.; Eltantawy, E.<br>United Nations Organization (UNO), 2021</p>
+        </div>
+        <div class="cv-entry">
+          <p class="cv-entry-title">Certified Archicad User (ES)</p>
+          <p class="cv-entry-sub">Graphisoft Latinoamérica, 2021</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end col-right -->
+
+<script>
+  /* ── project data ── */
+  const projects = {
+    forest: {
+      title: "Architecture inside a protected forest",
+      collab: "With the guidance of: AlBorde Architects & Maria Gabriela Chica",
+      overview: "A proposal for interior and immediate exterior spaces within a protected urban forest, developed from the master plan by Alborde Architecture. The project departs from a simple question: how do materials enter a forest without acting as invaders? Bamboo, wood, and Ganoderma lucidum mycelium were explored as structural and spatial elements — materials that belong to the ecosystem rather than imposing on it. Designed for a city that urgently needs its green spaces.",
+      images: [
+        { caption: "Axonometry of meeting table designed with mycelium and wood" },
+        { caption: "Axonometry of side table designed with mycelium and wood" },
+      ]
+    },
+    shade: {
+      title: "Shared shade — Urban furniture",
+      collab: "",
+      overview: "Urban furniture proposal exploring shared public space and community in Guayaquil.",
+      images: [
+        { caption: "Elevation drawing, shared bench under tree canopy" },
+      ]
+    },
+    /* ↓ COPIA ESTE BLOQUE para agregar más proyectos ↓
+    nombre_corto: {
+      title: "Título completo del proyecto",
+      collab: "Con la colaboración de: Nombre (o deja vacío)",
+      overview: "Descripción del proyecto.",
+      images: [
+        { caption: "Pie de foto 1" },
+        { caption: "Pie de foto 2" },
+      ]
+    },
+    */
+  };
+
+  /* ── navigation ── */
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+
+    const target = id ? 'panel-' + id : 'panel-empty';
+    const el = document.getElementById(target);
+    if (el) el.classList.add('visible');
+
+    if (id) {
+      const nav = document.getElementById('nav-' + id);
+      if (nav) nav.classList.add('active');
+    }
+
+    document.querySelector('.col-right').scrollTop = 0;
+  }
+
+  /* ── project detail ── */
+  function showDetail(id) {
+    const p = projects[id];
+    if (!p) return;
+
+    document.getElementById('detail-title').textContent = p.title;
+    document.getElementById('detail-collab').textContent = p.collab;
+    document.getElementById('detail-overview').textContent = p.overview;
+
+    const container = document.getElementById('detail-images');
+    container.innerHTML = '';
+
+    p.images.forEach(img => {
+      const wrap = document.createElement('div');
+      wrap.className = 'detail-img-wrap';
+
+      if (img.src) {
+        const el = document.createElement('img');
+        el.src = img.src;
+        el.alt = img.caption || '';
+        wrap.appendChild(el);
+      } else {
+        const ph = document.createElement('div');
+        ph.className = 'img-placeholder';
+        ph.textContent = '[ imagen ]';
+        wrap.appendChild(ph);
+      }
+
+      if (img.caption) {
+        const cap = document.createElement('p');
+        cap.className = 'detail-caption';
+        cap.textContent = img.caption;
+        wrap.appendChild(cap);
+      }
+
+      container.appendChild(wrap);
+    });
+
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+    document.getElementById('panel-detail').classList.add('visible');
+    document.querySelector('.col-right').scrollTop = 0;
+  }
+</script>
+
+</body>
+</html>
